@@ -10,9 +10,9 @@ export class CNFService extends core.Construct {
     const bucket = new s3.Bucket(this, "WidgetStore");
 
     const handler = new lambda.Function(this, "WidgetHandler", {
-      runtime: lambda.Runtime.NODEJS_10_X, // So we can use async in widget.js
+      runtime: lambda.Runtime.PYTHON_3_8,
       code: lambda.Code.fromAsset("resources"),
-      handler: "cnfAsset.main",
+      handler: "cnfAsset.mainHandler",
       environment: {
         BUCKET: bucket.bucketName
       }
@@ -26,28 +26,14 @@ export class CNFService extends core.Construct {
     });
 
 
-    const widget = api.root.addResource("{id}");
+    const api1 = api.root.addResource("{test-path}");
+    const api2 = api.root.addResource("test-path2");
 
-    // Add new widget to bucket with: POST /{id}
-    const postWidgetIntegration = new apigateway.LambdaIntegration(handler);
+    const getTestPathIntegrationWithLambda = new apigateway.LambdaIntegration(handler);
+    
+    api1.addMethod("GET", getTestPathIntegrationWithLambda);
+    api2.addMethod("GET", getTestPathIntegrationWithLambda);
 
-    // Get a specific widget from bucket with: GET /{id}
-    const getWidgetIntegration = new apigateway.LambdaIntegration(handler);
-
-    // Remove a specific widget from the bucket with: DELETE /{id}
-    const deleteWidgetIntegration = new apigateway.LambdaIntegration(handler);
-
-    widget.addMethod("POST", postWidgetIntegration); // POST /{id}
-    widget.addMethod("GET", getWidgetIntegration); // GET /{id}
-    widget.addMethod("DELETE", deleteWidgetIntegration); // DELETE /{id}
-
-
-
-    const getWidgetsIntegration = new apigateway.LambdaIntegration(handler, {
-      requestTemplates: { "application/json": '{ "statusCode": "200" }' }
-    });
-
-    api.root.addMethod("GET", getWidgetsIntegration); // GET /
   }
 }
 
