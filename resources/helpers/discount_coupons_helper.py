@@ -2,8 +2,8 @@ from datetime import datetime
 
 def validateDiscountCoupon(inputObject):
 
-    requiredFields = [ "tag_line" ,"link", "discount_percentage","promo_code",
-    "category", "advertiser", "start_date", "end_date"]
+    requiredFields = [ "tag_line" ,"link", "discount_percent","promo_code",
+    "category", "advertiser", "end_date"]
 
     if(inputObject is None):
             return "The schema is null."
