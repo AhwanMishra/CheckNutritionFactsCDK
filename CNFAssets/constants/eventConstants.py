@@ -1,0 +1,7 @@
+HTTP_METHOD = "httpMethod"
+GET = "GET"
+POST = "POST"
+DELETE = "DELETE"
+PATH_PARAMS = "pathParameters"
+QUERY_PARAMS = "queryStringParameters"
+BODY = "body"
