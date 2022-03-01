@@ -49,7 +49,43 @@ export class CNFService extends cdk.Stack {
 
     const api = new cdk.aws_apigateway.RestApi(this, "cnf-api", {
       restApiName: "CNF Service",
-      description: "This service serves content for CNF service.."
+      description: "This service serves content for CNF service..",
+      defaultCorsPreflightOptions: {
+        allowOrigins: ['*'],
+        allowMethods: ['OPTIONS', 'GET'],
+        allowHeaders: ['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key']
+      },
+    });
+
+    const cfnApiKey = api.addApiKey("cnfApiKeyID", {
+      apiKeyName : "cnfApiKey",
+      description: 'APIKey used by my api to do awesome stuff',
+    })
+    
+    const usagePlan = api.addUsagePlan ("CnfUsagePlan", {
+      name: 'CnfUsagePlan',
+      throttle: {
+        rateLimit: 1000,
+        burstLimit: 500
+    },
+    quota: {
+      limit: 999999,
+      period: cdk.aws_apigateway.Period.MONTH
+    }
+  });
+
+    usagePlan.addApiKey(cfnApiKey);
+    usagePlan.addApiStage({
+      stage: api.deploymentStage,
+      // throttle: [
+      //   {
+      //     method: echoMethod,
+      //     throttle: {
+      //       rateLimit: 10,
+      //       burstLimit: 2
+      //     }
+      //   }
+      // ]
     });
 
     const pathIntegrationWithLambda = new cdk.aws_apigateway.LambdaIntegration(handler);
@@ -62,11 +98,10 @@ export class CNFService extends cdk.Stack {
     const productDetailsApi = api.root.addResource("product-details");
     const productDetailsGetApi = productDetailsApi.addResource("{productId}");
 
-    discountCouponsApi.addMethod("GET", pathIntegrationWithLambda);
-    discountCouponsApi.addMethod("POST", pathIntegrationWithLambda);
-    discountCouponsDeleteApi.addMethod("DELETE", pathIntegrationWithLambda);
-    searchApi.addMethod("GET", pathIntegrationWithLambda);
-    productDetailsGetApi.addMethod("GET", pathIntegrationWithLambda);
+    discountCouponsApi.addMethod("GET", pathIntegrationWithLambda, {apiKeyRequired : true});
+    discountCouponsApi.addMethod("POST", pathIntegrationWithLambda, {apiKeyRequired : true});
+    discountCouponsDeleteApi.addMethod("DELETE", pathIntegrationWithLambda, {apiKeyRequired : true});
+    searchApi.addMethod("GET", pathIntegrationWithLambda, {apiKeyRequired : true});
+    productDetailsGetApi.addMethod("GET", pathIntegrationWithLambda, {apiKeyRequired : true});
   }
 }
-

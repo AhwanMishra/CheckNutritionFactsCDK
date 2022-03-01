@@ -9,7 +9,8 @@ def getBasicResponse(statusCode, headers, body):
 
 def getBasicHeader():
     headers = {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
+    'Access-Control-Allow-Origin': '*'
     }
 
     return headers;
