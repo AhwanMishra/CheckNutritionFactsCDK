@@ -22,15 +22,12 @@ def putDataInBucket(bucketName, fileName, content):
         if discountCouponsHelper.validateDiscountCoupon(contentAsObject[i]) != "OK":
             return validateResponse
 
-        existingData[contentAsObject[i]['link']] = contentAsObject[i]    
+        existingData["productList"].append(contentAsObject[i])    
 
-    bucket = bucketName
-    key = fileName
-
-    response = s3.put_object(Bucket=bucket, Key=key, Body=json.dumps(existingData))
+    response = s3.put_object(Bucket=bucketName, Key=fileName, Body=json.dumps(existingData))
 
     return response
 
 def deleteAllOffers(bucketName, fileName):
-    response = s3.put_object(Bucket=bucketName, Key=fileName, Body=json.dumps({}))
+    response = s3.put_object(Bucket=bucketName, Key=fileName, Body=json.dumps({"productList" : []}))
     return response

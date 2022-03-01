@@ -1,17 +1,27 @@
 from templates import responseTemplates
-from utils import discountCouponsUtil, commonUtil
+from utils import discountCouponsUtil, commonUtil, paginationUtil
 from constants import resourceConstants as rCnt
 from constants import eventConstants as eCnt
 import json
 
+PAGE_NUMBER = "pageNumber"
 
 
 def getDiscountCoupons(event):
 
+    queryParams = event[eCnt.QUERY_PARAMS]
+
     if event[eCnt.HTTP_METHOD] == eCnt.GET:
         
-        body = json.dumps(commonUtil.getBucketData(rCnt.CNF_DISCOUNT_COUPONS_BUCKET_NAME,
-         rCnt.DISCOUNT_JSON_FILE_NAME ), indent=1)
+        pageNumber = 0
+        
+        if queryParams != None and PAGE_NUMBER in queryParams:
+            pageNumber = int(queryParams[PAGE_NUMBER])
+
+        jsonObj = commonUtil.getBucketData(rCnt.CNF_DISCOUNT_COUPONS_BUCKET_NAME,
+         rCnt.DISCOUNT_JSON_FILE_NAME )
+
+        body = json.dumps(paginationUtil.getProductsForPage(jsonObj, pageNumber, rCnt.ADS_PER_PAGE), indent=1)
         
         return responseTemplates.getBasicResponse(200, responseTemplates.getBasicHeader(), body)
 

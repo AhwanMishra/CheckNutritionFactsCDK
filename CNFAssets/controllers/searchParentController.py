@@ -14,9 +14,14 @@ def getSearchResult(event):
 
     queryParams = event[eCnt.QUERY_PARAMS]
 
-    if CATEGORY in  queryParams and SUB_CATEGORY in queryParams and PAGE_NUMBER in queryParams:
-        body = searchUtil.getProductCategoryMetaData(queryParams[CATEGORY], queryParams[SUB_CATEGORY], int(queryParams[PAGE_NUMBER]))
+    if queryParams != None and CATEGORY in  queryParams and SUB_CATEGORY in queryParams:
+
+        pageNumber = 0
+        if  PAGE_NUMBER in queryParams:
+            pageNumber = int(queryParams[PAGE_NUMBER])
+
+        body = searchUtil.getProductCategoryMetaData(queryParams[CATEGORY], queryParams[SUB_CATEGORY], pageNumber)
         return responseTemplates.getBasicResponse(200, responseTemplates.getBasicHeader(), body)
 
 
-    return responseTemplates.getBasicResponse(405, responseTemplates.getBasicHeader(), "Invalid or missing params ! \n Mandatory Params : \ncategory\nsub-category\npageNumber")
+    return responseTemplates.getBasicResponse(405, responseTemplates.getBasicHeader(), "Invalid or missing params ! \n Mandatory Params : \ncategory\nsub-category")

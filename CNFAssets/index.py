@@ -4,14 +4,14 @@ from templates import responseTemplates
 
 def handler(event, context):
 
-    if event["resource"] == "/discount-coupons" or event["resource"] == "/discount-coupons/{promo_code}":
-        return discountCouponsController.getDiscountCoupons(event)
-
     if event["resource"] =="/product-details/{productId}":
         return productDetailsController.getProductDetails(event)
 
     if event["resource"] == "/search":
         return searchParentController.getSearchResult(event)
+
+    if event["resource"] == "/discount-coupons" or event["resource"] == "/discount-coupons/{promo_code}":
+        return discountCouponsController.getDiscountCoupons(event)
         
     return responseTemplates.getBasicResponse(405, responseTemplates.getBasicHeader(), "Wrong inputs")
 
