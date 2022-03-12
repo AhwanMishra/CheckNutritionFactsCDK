@@ -15,6 +15,7 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
 
 ## AWS CLI Commands:
-
+aws s3 ls
 aws s3 cp categoryMetaData s3://cnf-product-category-metadata/ --recursive
+aws s3 rm s3://YOUR_BUCKET/YOUR_FOLDER/  --recursive
 `It uploads all sub directories or files to S3 recursively`
