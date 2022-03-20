@@ -1,4 +1,6 @@
 import * as cdk from "aws-cdk-lib";
+import { Duration } from "aws-cdk-lib";
+import { CfnIndex } from "aws-cdk-lib/aws-kendra";
 
 export class CnfServieStaticWebSite extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
@@ -18,8 +20,26 @@ export class CnfServieStaticWebSite extends cdk.Stack {
       publicReadAccess: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       websiteIndexDocument : "index.html",
-      websiteErrorDocument : "index.html" // Why ? Ans: https://stackoverflow.com/questions/51218979/react-router-doesnt-work-in-aws-s3-bucket
-    });
+      // websiteErrorDocument : "index.html", 
+      // Why ? Ans: https://stackoverflow.com/questions/51218979/react-router-doesnt-work-in-aws-s3-bucket (Still it throws 404 response code hence not recognised by Google)
+      // https://via.studio/journal/hosting-a-reactjs-app-with-routing-on-aws-s3
+    //   websiteRoutingRules :
+    //   [
+    //     {
+    //       condition: { httpErrorCodeReturnedEquals: '403'},
+    //       replaceKey: cdk.aws_s3.ReplaceKey.prefixWith('#/'),
+    //       hostName: CNF_URL_WWW_VERSION,
+    //       httpRedirectCode : "301",
+    //     },
+    //     {
+    //       condition: { httpErrorCodeReturnedEquals: '404'},
+    //       replaceKey: cdk.aws_s3.ReplaceKey.('#/'),
+    //       hostName: CNF_URL_WWW_VERSION,
+    //       httpRedirectCode : "301",
+    //     }
+    //     ]
+    }
+    );
 
     /**
      *  2nd S3 bucket, non www version. We wont put any content here.
@@ -85,7 +105,19 @@ export class CnfServieStaticWebSite extends cdk.Stack {
         allowedMethods : cdk.aws_cloudfront.AllowedMethods.ALLOW_GET_HEAD,
       },
       certificate : certCfnWWW,
-      domainNames : [CNF_URL_WWW_VERSION]
+      domainNames : [CNF_URL_WWW_VERSION],
+      errorResponses : [{
+        httpStatus: 403,
+        responseHttpStatus : 200,
+        responsePagePath : "/index.html",
+        ttl : Duration.millis(0)
+      },
+      {
+        httpStatus: 404,
+        responseHttpStatus : 200,
+        responsePagePath : "/index.html",
+        ttl : Duration.millis(0)
+      }]
     });
 
     // Non WWW version
@@ -96,7 +128,19 @@ export class CnfServieStaticWebSite extends cdk.Stack {
         allowedMethods : cdk.aws_cloudfront.AllowedMethods.ALLOW_GET_HEAD,
       },
       certificate : certCfn,
-      domainNames : [CNF_URL_NON_WWW_VERSION]
+      domainNames : [CNF_URL_NON_WWW_VERSION],
+      errorResponses : [{
+        httpStatus: 403,
+        responseHttpStatus : 200,
+        responsePagePath : "/index.html",
+        ttl : Duration.millis(0)
+      },
+      {
+        httpStatus: 404,
+        responseHttpStatus : 200,
+        responsePagePath : "/index.html",
+        ttl : Duration.millis(0)
+      }]
     });
 
     
